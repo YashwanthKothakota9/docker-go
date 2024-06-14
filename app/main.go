@@ -16,15 +16,17 @@ func main() {
 
 	command := os.Args[3]
 	args := os.Args[4:len(os.Args)]
+	tmpDir := "/tmp/dockerfs"
 
 	cmd := exec.Command(command, args...)
-	// cmd.Stdout = os.Stdout
-	// cmd.Stderr = os.Stderr
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Chroot:     tmpDir,
+		Cloneflags: syscall.CLONE_NEWPID,
+	}
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	tmpDir := "/tmp/dockerfs"
 	err := os.Mkdir(tmpDir, 0744)
 	if err != nil {
 		//already directory exists
@@ -39,9 +41,7 @@ func main() {
 	if err != nil {
 		panic("copy failed: " + err.Error())
 	}
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Chroot: tmpDir,
-	}
+
 	err = cmd.Run()
 	if err != nil {
 		fmt.Printf("Err: %v", err)
