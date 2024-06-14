@@ -18,11 +18,11 @@ func main() {
 	cmd := exec.Command(command, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err := cmd.Run()
-	if err != nil {
+
+	if err := cmd.Run(); err != nil {
 		fmt.Printf("Err: %v", err)
-		os.Exit(1)
+		fmt.Println("ProcessState:", cmd.ProcessState)
+		os.Exit(cmd.ProcessState.ExitCode())
 	}
-	fmt.Println("ProcessState:", cmd.ProcessState)
-	os.Exit(cmd.ProcessState.ExitCode())
+
 }
